@@ -3,9 +3,11 @@
 #parse command flags
 #-------------------
 
-#compile mode: Load/Compile. Default Load
+#compile mode: Load/Compile. Default Load -
 set comp_mode = '-sncompargs -enable_DAC'
 set xrun_flags = ''
+set libdir_name = '-xmlibdirname proj_libdid'
+set libdir_path = '-xmlibdirpath ./'
 
 while ("$1" =~ -*)
     switch ($1)
@@ -22,8 +24,18 @@ while ("$1" =~ -*)
         set xrun_flags = ($xrun_flags $1)
         shift
         breaksw
+    case '-lib_name':
+        shift
+        set libdir_name = ('-xmlibdirname' $1)
+        shift
+        breaksw
+    case '-lib_path':
+        shift
+        set libdir_name = ('-xmlibdirpath' $1)
+        shift
+        breaksw
     default:
-        echo 'Wrong parameters (add usage)'
+        echo 'Wrong parameters (Need to add usage instructions)'
         exit -1
         breaksw
     endsw
@@ -49,11 +61,13 @@ setenv SPECMAN_PATH    "$CDS_PATH/patches:.:com:e_src/dalton/e:e_src/wb_mdl_lib/
 setenv SPECMAN_PRE_COMMANDS "global.host_bus = ESPI"
 
 # Build run command
-set xrun_run_cmd = "xrun -f dalton_files -timescale 1ns/10ps -input runtest.ecom -exit"
+set xrun_run_cmd = "xrun -f dalton_files  -input runtest.ecom -exit"
 set xrun_run_cmd = ($xrun_run_cmd $comp_mode) 
 set xrun_run_cmd = ($xrun_run_cmd $xrun_flags) 
+set xrun_run_cmd = ($xrun_run_cmd $libdir_name) 
+set xrun_run_cmd = ($xrun_run_cmd $libdir_path) 
 
 #run command
 echo $xrun_run_cmd
-#$xrun_run_cmd
+$xrun_run_cmd
 
